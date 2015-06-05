@@ -1,12 +1,8 @@
 package main
 
-
-import "fmt"
-
-// run via 'go build main.go && ./main'
+import (
+)
 
 func main() {
-	fileName := "/test/file/name"
-
-	fmt.Println(fileName)
+	//ParseFile("/Users/bradbowie/Desktop/metrics-calamp-blue-20501.log");
 }
