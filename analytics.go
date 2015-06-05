@@ -26,7 +26,7 @@ func (a *Analytics) NewRow(data map[string]interface{}) {
     //TODO: mine out desired values
 }
 
-func (a *Analytics) Display() {
+func (a *Analytics) Print() {
     fmt.Println("Key: " + a.key);
     fmt.Println(fmt.Sprintf("Total Rows: %d", a.total));
 }
