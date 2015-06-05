@@ -20,7 +20,7 @@ func NewAnalytics(key string) *Analytics {
     a.total = 0;
     a.sum = 0;
     a.max = 0;
-    a.min = 0; // TODO: fix min so it doesn't default to 0
+    a.min = 9999999999; // TODO: fix min so it doesn't default to 0
 
     return a;
 }
@@ -35,12 +35,9 @@ func (a *Analytics) NewRow(data map[string]interface{}) {
             a.numberEncountered(casted);
         case float64:
             a.numberEncountered(int(casted));
-        default:
-            // TODO: add properties to extraProperties Set
-            // fmt.Printf("%q\n", casted)
+        case map[string]interface{}:
+            a.mapEncountered(casted);
     }
-
-    //TODO: mine out desired values
 }
 
 func (a *Analytics) numberEncountered(encountered int) {
@@ -53,7 +50,13 @@ func (a *Analytics) numberEncountered(encountered int) {
     if(a.min > encountered) {
         a.min = encountered;
     }
+}
 
+func (a *Analytics) mapEncountered(encountered map[string]interface{}) {
+    fmt.Sprintf("%q", encountered);
+    fmt.Println("not a leaf node!")
+    
+    // TODO: add properties to extraProperties Set
 }
 
 func nestedGet(key string, data interface{}) (value interface{}) {
