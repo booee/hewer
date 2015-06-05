@@ -37,7 +37,7 @@ func (a *Analytics) NewRow(data map[string]interface{}) {
             a.numberEncountered(int(casted));
         default:
             // TODO: add properties to extraProperties Set
-            fmt.Printf("%q\n", casted)
+            // fmt.Printf("%q\n", casted)
     }
 
     //TODO: mine out desired values
