@@ -7,7 +7,8 @@ import(
 
 type Analytics struct {
     key string
-    total int
+    rows int
+    encounters int
     sum int
     max int
     min int
@@ -17,16 +18,17 @@ func NewAnalytics(key string) *Analytics {
     a := new(Analytics);
 
     a.key = key;
-    a.total = 0;
+    a.rows = 0;
+    a.encounters = 0;
     a.sum = 0;
     a.max = 0;
-    a.min = 9999999999; // TODO: fix min so it doesn't default to 0
+    a.min = 9999999999; // TODO: find a better way to represent max/min
 
     return a;
 }
 
 func (a *Analytics) NewRow(data map[string]interface{}) {
-    a.total += 1;
+    a.rows += 1;
 
     watchedValue := nestedGet(a.key, data);
 
@@ -41,6 +43,7 @@ func (a *Analytics) NewRow(data map[string]interface{}) {
 }
 
 func (a *Analytics) numberEncountered(encountered int) {
+    a.encounters += 1;
     a.sum += encountered;
 
     if(a.max < encountered) {
@@ -53,9 +56,10 @@ func (a *Analytics) numberEncountered(encountered int) {
 }
 
 func (a *Analytics) mapEncountered(encountered map[string]interface{}) {
+    a.encounters += 1;
     fmt.Sprintf("%q", encountered);
     fmt.Println("not a leaf node!")
-    
+
     // TODO: add properties to extraProperties Set
 }
 
@@ -77,14 +81,14 @@ func nestedGet(key string, data interface{}) (value interface{}) {
         }
     }
 
-    // value = data["processingMs"];
     return value;
 }
 
 func (a *Analytics) Print() {
     fmt.Println("Key: " + a.key);
-    fmt.Printf("Total Rows: %d\n", a.total);
-    fmt.Printf("Average: %d\n", (a.sum / a.total));
+    fmt.Printf("Total Rows: %d\n", a.rows);
+    fmt.Printf("Total Encounters: %d\n", a.encounters);
+    fmt.Printf("Average: %d\n", (a.sum / a.encounters));
     fmt.Printf("Max: %d\n", a.max);
     fmt.Printf("Min: %d\n", a.min);
 }
