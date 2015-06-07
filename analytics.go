@@ -2,6 +2,7 @@ package main;
 
 import(
     "fmt"
+    "sort"
     "strings"
 )
 
@@ -12,6 +13,7 @@ type Analytics struct {
     sum int
     max int
     min int
+    subkeys map[string]struct{} // map used as a set
 }
 
 func NewAnalytics(key string) *Analytics {
@@ -58,12 +60,31 @@ func (a *Analytics) numberEncountered(encountered int) {
 func (a *Analytics) mapEncountered(encountered map[string]interface{}) {
     a.encounters += 1;
     fmt.Sprintf("%q", encountered);
-    fmt.Println("not a leaf node!")
+    // fmt.Println("not a leaf node!")
 
-    // TODO: add properties to extraProperties Set
+    if len(a.subkeys) == 0 {
+        // make map and populate
+        a.subkeys = make(map[string]struct{}, len(encountered))
+        for k := range encountered {
+            a.subkeys[k] = struct{}{}
+        }
+    } else {
+        // iterate map, append to subkeys as necessary
+        for k := range encountered {
+            // check if subkeys contains k
+            if _, inSet := a.subkeys[k]; !inSet {
+                // fmt.Println("Found new subkey:", k)
+                a.subkeys[k] = struct{}{}
+            }
+        }
+    }
 }
 
 func nestedGet(key string, data interface{}) (value interface{}) {
+    if key == "" {
+        return data
+    }
+
     keys := strings.Split(key, ".");
 
     value = data;
@@ -84,6 +105,17 @@ func nestedGet(key string, data interface{}) (value interface{}) {
     return value;
 }
 
+func getSortedKeys(m map[string]struct{}) ([]string) {
+    sortedKeys := make([]string, len(m))
+    i := 0
+    for k, _ := range m {
+        sortedKeys[i] = k
+        i++
+    }
+    sort.Strings(sortedKeys)
+    return sortedKeys
+}
+
 func (a *Analytics) Print() {
     fmt.Println("Key: " + a.key);
     fmt.Printf("Total Rows: %d\n", a.rows);
@@ -93,4 +125,5 @@ func (a *Analytics) Print() {
     }
     fmt.Printf("Max: %d\n", a.max);
     fmt.Printf("Min: %d\n", a.min);
+    fmt.Printf("Subkeys: %v\n", getSortedKeys(a.subkeys))
 }
