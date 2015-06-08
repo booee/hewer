@@ -1,7 +1,22 @@
 # hewer
+v0.1.0
 
-### Need
+### Installation
 
-### Some
+Install package via go tool
+```
+$ go get github.com/NexTraq/hewer
+```
 
-### Docs
+Verify Installation
+```
+$ hewer -v
+```
+
+### Usage
+
+```
+$ hewer <fileName> -k <keyName>
+```
+
+run `$ hewer help` for more information
