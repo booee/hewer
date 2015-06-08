@@ -25,4 +25,4 @@ $ hewer -v
 $ hewer <fileName> -k <keyName>
 ```
 
-run `$ hewer help` for more information
+run `$ hewer --help` for more information
