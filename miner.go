@@ -20,8 +20,8 @@ func ParseFile(fileName string, analytics *Analytics) {
     scanner := bufio.NewScanner(reader)
     var data map[string]interface{}
 
-	fmt.Println("Mining JSON file: " + fileName);
-	scanner.Split(bufio.ScanLines)
+    fmt.Println("Mining JSON file: " + fileName);
+    scanner.Split(bufio.ScanLines)
     for scanner.Scan() {
         err := json.Unmarshal(scanner.Bytes(), &data)
 
