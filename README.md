@@ -2,7 +2,10 @@
 v0.1.0
 
 #### Installation Prerequisites
-1. Ensure [workspace](https://golang.org/doc/code.html#Workspaces) and [environment variables](https://golang.org/doc/code.html#GOPATH) have been setup according to specs on golang.org
+1. Have go-lang installed ([duh](http://lmgtfy.com/?q=go-lang+install+download))
+1. Environment setup according to specs on [golang.org](https://golang.org/docs)
+  * [Workspace](https://golang.org/doc/code.html#Workspaces)
+  * [Environment variable(s)](https://golang.org/doc/code.html#GOPATH) - and don't forget to add `$GOPATH/bin` to your `PATH`
 
 ### Installation
 
