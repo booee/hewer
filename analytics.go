@@ -41,6 +41,8 @@ func (a *Analytics) NewRow(data map[string]interface{}) {
             a.numberEncountered(int(casted));
         case map[string]interface{}:
             a.mapEncountered(casted);
+        case []interface{}:
+            a.sliceEncountered(casted)
     }
 }
 
@@ -78,6 +80,15 @@ func (a *Analytics) mapEncountered(encountered map[string]interface{}) {
             }
         }
     }
+}
+
+func (a *Analytics) sliceEncountered(encountered []interface{}) {
+    //TODO if slice contains strings, then optionally group by value
+    //     e.g separate enc/sum/min/max per value
+    //     would require a struct as subset of Analytics
+    //     could either group string values by default or require a new cli flag
+    //     also, what about json objects with properties in slice?
+    a.numberEncountered(len(encountered))
 }
 
 func nestedGet(key string, data interface{}) (value interface{}) {
