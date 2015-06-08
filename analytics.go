@@ -120,10 +120,13 @@ func (a *Analytics) Print() {
     fmt.Println("Key: " + a.key);
     fmt.Printf("Total Rows: %d\n", a.rows);
     fmt.Printf("Total Encounters: %d\n", a.encounters);
-    if a.encounters > 0 {
-        fmt.Printf("Average: %d\n", (a.sum / a.encounters));
+    if len(a.subkeys) > 0 {
+        fmt.Printf("Subkeys: %v\n", getSortedKeys(a.subkeys))
+    } else {
+        if a.encounters > 0 {
+            fmt.Printf("Average: %d\n", (a.sum / a.encounters));
+        }
+        fmt.Printf("Max: %d\n", a.max);
+        fmt.Printf("Min: %d\n", a.min);
     }
-    fmt.Printf("Max: %d\n", a.max);
-    fmt.Printf("Min: %d\n", a.min);
-    fmt.Printf("Subkeys: %v\n", getSortedKeys(a.subkeys))
 }
