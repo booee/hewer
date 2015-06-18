@@ -7,8 +7,9 @@ import(
 )
 
 type Analytics struct {
-    key string
     rows int
+    jsonRows int
+    key string
     encounters int
     sum int
     max int
@@ -23,15 +24,18 @@ func NewAnalytics(key string) *Analytics {
     a.rows = 0;
     a.encounters = 0;
     a.sum = 0;
-    a.max = 0;
+    a.max = -1;
     a.min = 9999999999; // TODO: find a better way to represent max/min
 
     return a;
 }
 
-func (a *Analytics) NewRow(data map[string]interface{}) {
-    a.rows += 1;
+func (a *Analytics) OnRow() {
+    a.rows++
+}
 
+func (a *Analytics) OnData(data map[string]interface{}) {
+    a.jsonRows++
     watchedValue := nestedGet(a.key, data);
 
     switch casted := watchedValue.(type) {
@@ -128,16 +132,28 @@ func getSortedKeys(m map[string]struct{}) ([]string) {
 }
 
 func (a *Analytics) Print() {
-    fmt.Println("Key: " + a.key);
     fmt.Printf("Total Rows: %d\n", a.rows);
-    fmt.Printf("Total Encounters: %d\n", a.encounters);
-    if len(a.subkeys) > 0 {
-        fmt.Printf("Subkeys: %v\n", getSortedKeys(a.subkeys))
-    } else {
+
+    if a.jsonRows > 0 {
+        printDataAnalytics(a);
+    }
+}
+
+func printDataAnalytics(a *Analytics) {
+    fmt.Printf("JSON Rows: %d\n", a.rows);
+
+    if a.key != "" {
+        fmt.Println("Key: " + a.key);
+        fmt.Printf("Total Encounters: %d\n", a.encounters);
+
         if a.encounters > 0 {
             fmt.Printf("Average: %d\n", (a.sum / a.encounters));
+            fmt.Printf("Max: %d\n", a.max);
+            fmt.Printf("Min: %d\n", a.min);
         }
-        fmt.Printf("Max: %d\n", a.max);
-        fmt.Printf("Min: %d\n", a.min);
+    }
+
+    if len(a.subkeys) > 0 {
+        fmt.Printf("Subkeys: %v\n", getSortedKeys(a.subkeys))
     }
 }
