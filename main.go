@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"github.com/mgutz/minimist"
+	"os"
 )
 
 var name = "hewer"
@@ -60,7 +60,7 @@ func main() {
 	}
 
 	// print all results
-	analytics.Print();
+	analytics.Print()
 }
 
 func helpAndExit() {
