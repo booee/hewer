@@ -24,14 +24,14 @@ func ParseFile(fileName string, analytics *Analytics) {
 	skippedLines := 0
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
-		analytics.OnRow()
+        analytics.OnRow()
 		err := json.Unmarshal(scanner.Bytes(), &data)
 
-		if err != nil {
-			skippedLines++
-		} else {
-			analytics.OnData(data)
-		}
+        if err != nil {
+            skippedLines++
+        } else {
+            analytics.OnData(data)
+        }
 	}
 
 	if skippedLines > 0 {
