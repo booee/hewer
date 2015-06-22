@@ -19,7 +19,7 @@ Options:
 
    -c <type>, --convert <type>  Convert the value at <key> to this type
                                 and print modified JSON to stdout. Valid
-								values are number, json, string
+                                values are number, json, string
 
    -h, --help                   Print this content and exit
 
