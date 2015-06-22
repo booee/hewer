@@ -5,7 +5,7 @@ v0.2.0
 
 hewer is a log file miner, a CLI app that can quickly parse and summarize large amounts of data from one or more log files.
 
-The current implementation assumes a log file consists only of JSON content (one JSON blob per line).
+The current implementation assumes a log file consists of JSON content (one JSON blob per line).
 From this, hewer will auto-discover JSON property keys that can be targeted for statistical analysis.
 For details on the CLI, see [Usage](#usage) below.
 
@@ -38,8 +38,28 @@ $ hewer -v
 
 ### Usage
 
+#### Summarize JSON data
+
 ```
 $ hewer [-k <keyName>] <fileName> [<anotherFileName>...]
+$ hewer <fileName> [<anotherFileName>...] [-k <keyName>]
 ```
+
+Collect stats for a given JSON key (possibly nested) and print the collected info to stdout. If no key is given, hewer will default to the root object of each JSON blob. Can be used to "discover" the JSON structure(s) within the file(s).
+
+#### Convert JSON values
+
+```
+$ hewer -k <keyName> -c <type> <fileName> [<anotherFileName>...]
+$ hewer <fileName> [<anotherFileName>...] -k <keyName> -c <type>
+```
+
+Convert the values for a given JSON key to a more useful type and print the modified JSON to stdout, which you can redirect to write to another file. Valid values for `<type>` are:
+
+- `number` (convert string to floating point or integer number)
+- `json` (convert a JSON-encoded string to raw JSON)
+- `string` (convert something to a string).
+
+Lines from the input file(s) that are not JSON will be preserved as is. If no key is given, no conversion will be done and the original contents of the file(s) will be echoed.
 
 Run `hewer --help` for more information
