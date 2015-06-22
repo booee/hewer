@@ -74,10 +74,7 @@ func nestedGet(key string, data interface{}) (value interface{}) {
 		switch t := value.(type) {
 		case map[string]interface{}:
 			value = t[k]
-
-		default:
-			// value doesn't exist b/c parent value isn't a map
-			panic(fmt.Sprintf("err mer gerrrd, %s doesn't exist in %s", k, key))
+			// ignore any other types/cases
 		}
 	}
 
@@ -142,7 +139,7 @@ func printDataAnalytics(a *Analytics) {
 		fmt.Println("Key: " + a.key)
 		fmt.Printf("Total Encounters: %d\n", a.encounters)
 
-		if a.encounters > 0 {
+		if a.encounters > 0 && a.max != -1 {
 			fmt.Printf("Average: %d\n", (a.sum / a.encounters))
 			fmt.Printf("Max: %d\n", a.max)
 			fmt.Printf("Min: %d\n", a.min)
