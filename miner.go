@@ -38,3 +38,29 @@ func ParseFile(fileName string, analytics *Analytics) {
 		fmt.Printf("Skipped %d non-JSON lines in '%s'.\n", skippedLines, fileName)
 	}
 }
+
+func ParseAndConvertFile(fileName string, converter *Converter) {
+	file, err := os.Open(fileName)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	defer file.Close()
+
+	reader := bufio.NewReader(file)
+	scanner := bufio.NewScanner(reader)
+	var data map[string]interface{} //TODO: support other types via interface{}
+
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		bytes := scanner.Bytes()
+		err := json.Unmarshal(bytes, &data)
+
+		if err == nil {
+			converter.OnJsonData(data)
+		} else {
+			converter.OnOtherData(bytes)
+		}
+	}
+}
