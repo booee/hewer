@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"sort"
 	"strings"
 )
@@ -18,7 +19,8 @@ type Analytics struct {
 	min int
 
 	// non-leaf node analytics
-	subkeys map[string]struct{} // map used as a set
+	subkeys   map[string]struct{} // map used as a set
+	datatypes map[string]struct{} // map used as a set
 }
 
 func NewAnalytics(key string) *Analytics {
@@ -45,6 +47,11 @@ func (a *Analytics) OnData(data map[string]interface{}) {
 
 	if watchedValue != nil {
 		a.encounters += 1
+
+		if len(a.datatypes) == 0 {
+			a.datatypes = make(map[string]struct{}, 1)
+		}
+		addStringToSet(fmt.Sprintf("%v", reflect.TypeOf(watchedValue)), a.datatypes)
 
 		switch casted := watchedValue.(type) {
 		case int:
@@ -81,6 +88,12 @@ func nestedGet(key string, data interface{}) (value interface{}) {
 	return value
 }
 
+func addStringToSet(str string, mapAsSet map[string]struct{}) {
+	if _, inSet := mapAsSet[str]; !inSet {
+		mapAsSet[str] = struct{}{}
+	}
+}
+
 func (a *Analytics) numberEncountered(encountered int) {
 	a.sum += encountered
 
@@ -94,24 +107,12 @@ func (a *Analytics) numberEncountered(encountered int) {
 }
 
 func (a *Analytics) mapEncountered(encountered map[string]interface{}) {
-	fmt.Sprintf("%q", encountered)
-	// fmt.Println("not a leaf node!")
-
 	if len(a.subkeys) == 0 {
-		// make map and populate
 		a.subkeys = make(map[string]struct{}, len(encountered))
-		for k := range encountered {
-			a.subkeys[k] = struct{}{}
-		}
-	} else {
-		// iterate map, append to subkeys as necessary
-		for k := range encountered {
-			// check if subkeys contains k
-			if _, inSet := a.subkeys[k]; !inSet {
-				// fmt.Println("Found new subkey:", k)
-				a.subkeys[k] = struct{}{}
-			}
-		}
+	}
+
+	for k := range encountered {
+		addStringToSet(k, a.subkeys)
 	}
 }
 
@@ -135,11 +136,14 @@ func (a *Analytics) Print() {
 func printDataAnalytics(a *Analytics) {
 	fmt.Printf("JSON Rows: %d\n", a.rows)
 
+	printDatatypes := true
+
 	if a.key != "" {
 		fmt.Println("Key: " + a.key)
 		fmt.Printf("Total Encounters: %d\n", a.encounters)
 
 		if a.encounters > 0 && a.max != -1 {
+			printDatatypes = false
 			fmt.Printf("Average: %d\n", (a.sum / a.encounters))
 			fmt.Printf("Max: %d\n", a.max)
 			fmt.Printf("Min: %d\n", a.min)
@@ -147,7 +151,12 @@ func printDataAnalytics(a *Analytics) {
 	}
 
 	if len(a.subkeys) > 0 {
+		printDatatypes = false
 		fmt.Printf("Subkeys: %v\n", getSortedKeys(a.subkeys))
+	}
+
+	if printDatatypes && len(a.datatypes) > 0 {
+		fmt.Printf("Types: %v\n", getSortedKeys(a.datatypes))
 	}
 }
 
