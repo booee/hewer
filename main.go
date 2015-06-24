@@ -10,7 +10,7 @@ var name = "hewer"
 var version = "0.2.0"
 
 var usage = `
-Mine the crap out of some JSON-only log files
+Mine the crap out of some JSON-based log files
 
 Usage: hewer [options] file [files...]
 Options:
