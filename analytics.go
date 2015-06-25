@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"reflect"
-	"sort"
 	"strings"
 )
 
@@ -14,9 +13,9 @@ type Analytics struct {
 	encounters int
 
 	// numerical analytics
-	sum int
-	max int
-	min int
+	sum float64
+	max float64
+	min float64
 
 	// non-leaf node analytics
 	subkeys   map[string]struct{} // map used as a set
@@ -51,13 +50,13 @@ func (a *Analytics) OnData(data map[string]interface{}) {
 		if len(a.datatypes) == 0 {
 			a.datatypes = make(map[string]struct{}, 1)
 		}
-		addStringToSet(fmt.Sprintf("%v", reflect.TypeOf(watchedValue)), a.datatypes)
+		AddStringToSet(fmt.Sprintf("%v", reflect.TypeOf(watchedValue)), a.datatypes)
 
 		switch casted := watchedValue.(type) {
 		case int:
-			a.numberEncountered(casted)
+			a.numberEncountered(float64(casted))
 		case float64:
-			a.numberEncountered(int(casted))
+			a.numberEncountered(casted)
 		case map[string]interface{}:
 			a.mapEncountered(casted)
 		case []interface{}:
@@ -88,13 +87,7 @@ func nestedGet(key string, data interface{}) (value interface{}) {
 	return value
 }
 
-func addStringToSet(str string, mapAsSet map[string]struct{}) {
-	if _, inSet := mapAsSet[str]; !inSet {
-		mapAsSet[str] = struct{}{}
-	}
-}
-
-func (a *Analytics) numberEncountered(encountered int) {
+func (a *Analytics) numberEncountered(encountered float64) {
 	a.sum += encountered
 
 	if a.max < encountered {
@@ -112,7 +105,7 @@ func (a *Analytics) mapEncountered(encountered map[string]interface{}) {
 	}
 
 	for k := range encountered {
-		addStringToSet(k, a.subkeys)
+		AddStringToSet(k, a.subkeys)
 	}
 }
 
@@ -122,7 +115,7 @@ func (a *Analytics) sliceEncountered(encountered []interface{}) {
 	//     would require a struct as subset of Analytics
 	//     could either group string values by default or require a new cli flag
 	//     also, what about json objects with properties in slice?
-	a.numberEncountered(len(encountered))
+	a.numberEncountered(float64(len(encountered)))
 }
 
 func (a *Analytics) Print() {
@@ -144,29 +137,18 @@ func printDataAnalytics(a *Analytics) {
 
 		if a.encounters > 0 && a.max != -1 {
 			printDatatypes = false
-			fmt.Printf("Average: %d\n", (a.sum / a.encounters))
-			fmt.Printf("Max: %d\n", a.max)
-			fmt.Printf("Min: %d\n", a.min)
+			fmt.Println("Average:", PrettyFormatFloat(a.sum/float64(a.encounters)))
+			fmt.Println("Max:", PrettyFormatFloat(a.max))
+			fmt.Println("Min:", PrettyFormatFloat(a.min))
 		}
 	}
 
 	if len(a.subkeys) > 0 {
 		printDatatypes = false
-		fmt.Printf("Subkeys: %v\n", getSortedKeys(a.subkeys))
+		fmt.Printf("Subkeys: %v\n", GetSortedKeys(a.subkeys))
 	}
 
 	if printDatatypes && len(a.datatypes) > 0 {
-		fmt.Printf("Types: %v\n", getSortedKeys(a.datatypes))
+		fmt.Printf("Types: %v\n", GetSortedKeys(a.datatypes))
 	}
-}
-
-func getSortedKeys(m map[string]struct{}) []string {
-	sortedKeys := make([]string, len(m))
-	i := 0
-	for k, _ := range m {
-		sortedKeys[i] = k
-		i++
-	}
-	sort.Strings(sortedKeys)
-	return sortedKeys
 }
